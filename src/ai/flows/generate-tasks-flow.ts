@@ -24,16 +24,21 @@ const prompt = ai.definePrompt({
   name: 'generateTasksPrompt',
   input: { schema: GenerateTasksInputSchema },
   output: { schema: GenerateTasksOutputSchema },
-  prompt: `You are an expert project manager. A user has provided a goal. Your job is to break it down into a series of smaller, actionable tasks and suggest a realistic deadline.
+  prompt: `You are an expert project manager. A user has provided a goal. Your job is to create a detailed mind map style breakdown of this goal into actionable tasks and suggest a realistic deadline.
 
-If the goal is complex, you should create nested sub-tasks to provide a clear hierarchy. For each task, provide a clear title and detailed, step-by-step instructions on how to complete it. The instructions should be comprehensive enough for someone with little context to understand what needs to be done. For each task and subtask, also provide a list of 1-3 relevant internet URLs that would be helpful as resources.
+Break the goal down into a deep hierarchy of tasks and sub-tasks to form a comprehensive mind map structure. For each task, provide:
+1. A clear title.
+2. Detailed, step-by-step instructions on how to complete it.
+3. A curated list of 3-5 high-quality sources. **Crucially, include a mix of YouTube video links (tutorials, guides) and authoritative articles.**
+
+The instructions should be comprehensive enough for someone with little context to understand what needs to be done.
 
 Critically, you must estimate a realistic deadline appropriate for a human. Do not assume this is the person's only focus. A person has a life, a job, and other commitments. For a simple goal, a deadline of a week might be appropriate. For a moderately complex goal (like 'Learn a new hobby'), suggest a deadline of 1-3 months. For a very complex goal (like 'Build a web application'), suggest a deadline of 6 months or more. Your suggested deadline should be achievable by a human, not an AI.
 
 Goal Title: {{{title}}}
 Goal Description: {{{description}}}
 
-Generate a list of tasks and a suggested deadline in YYYY-MM-DD format based on this goal.`,
+Generate the detailed task hierarchy and a suggested deadline in YYYY-MM-DD format based on this goal.`,
 });
 
 // Helper function to check if a URL is valid
