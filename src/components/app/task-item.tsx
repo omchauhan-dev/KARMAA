@@ -15,6 +15,7 @@ import type { Task } from '@/lib/types';
 import { ChevronRight, Plus, Trash2, Link as LinkIcon, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PomodoroTimer } from '@/components/app/pomodoro-timer';
 
 type TaskItemProps = {
   task: Task;
@@ -131,6 +132,12 @@ export function TaskItem({ task, level, onUpdate, onDelete, onAddSubTask }: Task
                 </Button>
               </TooltipTrigger>
               <TooltipContent><p>Add sub-task</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                 <span className="inline-block"> <PomodoroTimer /> </span>
+              </TooltipTrigger>
+              <TooltipContent><p>Focus Timer</p></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>

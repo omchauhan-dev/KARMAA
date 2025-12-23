@@ -20,9 +20,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { TaskItem } from '@/components/app/task-item';
-import { ArrowLeft, Plus, CalendarDays, Bot, Loader, RefreshCw } from 'lucide-react';
+import { MindMapView } from '@/components/app/mind-map-view';
+import { ArrowLeft, Plus, CalendarDays, Bot, Loader, RefreshCw, List, Network } from 'lucide-react';
 import Link from 'next/link';
 import { UpgradeDialog } from '@/components/app/upgrade-dialog';
+import { ExportButton } from '@/components/app/export-button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { GoalChat } from '@/components/app/goal-chat';
 
 // Helper function to add unique IDs to tasks and subtasks
 const addIdsToTasks = (tasks: Omit<Task, 'id' | 'completed' | 'subTasks'> & { subTasks: any[] }[]): Task[] => {
@@ -40,6 +44,7 @@ export default function GoalDetailPage() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -210,6 +215,7 @@ export default function GoalDetailPage() {
 
   return (
     <>
+      <GoalChat goal={goal} />
       <UpgradeDialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog} />
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
@@ -234,6 +240,9 @@ export default function GoalDetailPage() {
                 )}
               </div>
               <div className="pt-4">
+                <div className="flex justify-end mb-2">
+                    <ExportButton elementId="goal-content" goalTitle={goal.title} />
+                </div>
                 <div className="flex justify-between text-sm text-muted-foreground mb-1">
                   <span>Progress</span>
                   <span>{completedCount} / {totalCount}</span>
@@ -241,7 +250,28 @@ export default function GoalDetailPage() {
                 <Progress value={progress} />
               </div>
             </CardHeader>
-            <CardContent className="flex-grow space-y-2">
+            <CardContent className="flex-grow space-y-2" id="goal-content">
+              <div className="flex justify-end mb-4">
+                <div className="bg-muted p-1 rounded-md flex items-center">
+                  <Button
+                    variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'map' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('map')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Network className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
               {goal.generatingTasks ? (
                 <div className="flex flex-col items-center justify-center text-center py-10">
                   <Loader className="w-8 h-8 text-primary animate-spin mb-3" />
@@ -253,7 +283,7 @@ export default function GoalDetailPage() {
                   <p className="text-sm text-muted-foreground">No tasks generated yet.</p>
                   <p className="text-xs text-muted-foreground/80 mt-1">You can add tasks manually below.</p>
                 </div>
-              ) : (
+              ) : viewMode === 'list' ? (
                 goal.tasks.map((task) => (
                   <TaskItem
                     key={task.id}
@@ -264,6 +294,8 @@ export default function GoalDetailPage() {
                     onAddSubTask={addSubTask}
                   />
                 ))
+              ) : (
+                <MindMapView tasks={goal.tasks} goalTitle={goal.title} />
               )}
             </CardContent>
             <CardFooter className="grid grid-cols-2 gap-2">
