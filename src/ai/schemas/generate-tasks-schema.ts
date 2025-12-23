@@ -22,6 +22,7 @@ const TaskSchema: z.ZodType<any> = z.lazy(() =>
 export const GenerateTasksInputSchema = z.object({
   title: z.string().describe('The title of the goal.'),
   description: z.string().describe('The description of the goal.'),
+  type: z.enum(['learn', 'build']).describe('The type of goal: learn or build.'),
 });
 export type GenerateTasksInput = z.infer<typeof GenerateTasksInputSchema>;
 

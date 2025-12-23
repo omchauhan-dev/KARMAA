@@ -4,12 +4,18 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageSquare, X, Send } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MessageSquare, Send } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { chatWithGoal } from '@/ai/flows/chat-flow';
 import type { Goal } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 type GoalChatProps = {
   goal: Goal;
@@ -21,7 +27,6 @@ type Message = {
 };
 
 export function GoalChat({ goal }: GoalChatProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -56,60 +61,60 @@ export function GoalChat({ goal }: GoalChatProps) {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
-      {isOpen && (
-        <Card className="w-80 h-96 shadow-xl mb-4 flex flex-col">
-          <CardHeader className="p-3 border-b flex flex-row justify-between items-center">
-            <CardTitle className="text-sm font-medium">Goal Assistant</CardTitle>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsOpen(false)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="p-0 flex-grow flex flex-col overflow-hidden">
-            <ScrollArea className="flex-grow p-4 space-y-3">
+    <Sheet>
+      <SheetTrigger asChild>
+        <div className="fixed bottom-4 right-4 z-50">
+          <Button className="rounded-full h-12 w-12 shadow-lg">
+            <MessageSquare className="h-6 w-6" />
+          </Button>
+        </div>
+      </SheetTrigger>
+      <SheetContent className="flex flex-col h-full w-[400px] sm:w-[540px]">
+        <SheetHeader>
+          <SheetTitle>Goal Assistant</SheetTitle>
+        </SheetHeader>
+        <div className="flex-grow overflow-hidden flex flex-col mt-4">
+          <ScrollArea className="flex-grow pr-4">
+            <div className="space-y-4">
               {messages.length === 0 && (
-                <div className="text-center text-xs text-muted-foreground mt-4">
-                  Ask me anything about your goal!
+                <div className="text-center text-sm text-muted-foreground mt-8">
+                  <p>Ask me anything about your goal: <strong>{goal.title}</strong></p>
+                  <p className="mt-2 text-xs">I can help you break down tasks, suggest resources, or provide code snippets.</p>
                 </div>
               )}
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
                   className={cn(
-                    "mb-2 p-2 rounded-lg text-sm max-w-[85%]",
+                    "p-3 rounded-lg text-sm max-w-[85%]",
                     msg.role === 'user' 
                       ? "bg-primary text-primary-foreground ml-auto" 
                       : "bg-muted text-muted-foreground mr-auto"
                   )}
                 >
-                  {msg.content}
+                   <div className="whitespace-pre-wrap">{msg.content}</div>
                 </div>
               ))}
               {isLoading && (
-                 <div className="text-xs text-muted-foreground ml-2 animate-pulse">Thinking...</div>
+                 <div className="text-sm text-muted-foreground ml-2 animate-pulse">Thinking...</div>
               )}
-            </ScrollArea>
-            <div className="p-3 border-t flex gap-2">
+            </div>
+          </ScrollArea>
+          <div className="pt-4 mt-auto">
+            <div className="flex gap-2">
               <Input
                 placeholder="Type a message..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                className="h-8 text-sm"
               />
-              <Button size="icon" className="h-8 w-8" onClick={handleSend} disabled={isLoading}>
+              <Button size="icon" onClick={handleSend} disabled={isLoading}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className="rounded-full h-12 w-12 shadow-lg"
-      >
-        <MessageSquare className="h-6 w-6" />
-      </Button>
-    </div>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

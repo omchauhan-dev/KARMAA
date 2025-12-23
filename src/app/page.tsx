@@ -47,7 +47,7 @@ function HomePageContent() {
     }
   }, []);
   
-  const addGoal = useCallback(async (title: string, description: string, deadline?: Date) => {
+  const addGoal = useCallback(async (title: string, description: string, type: 'learn' | 'build', deadline?: Date) => {
     if (goals.length >= 3) {
       setShowUpgradeDialog(true);
       return;
@@ -58,6 +58,7 @@ function HomePageContent() {
       title,
       description,
       deadline: deadline?.toISOString(),
+      type,
       tasks: [],
       generatingTasks: true,
     };
@@ -71,7 +72,7 @@ function HomePageContent() {
         console.error("Could not save to localStorage.", error);
     }
 
-    const generationPromise = generateTasksForGoal({ title, description });
+    const generationPromise = generateTasksForGoal({ title, description, type });
 
 
     try {

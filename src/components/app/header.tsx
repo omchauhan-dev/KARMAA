@@ -31,11 +31,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { PlusCircle, Calendar as CalendarIcon, BookOpen, Hammer } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { FocusModeToggle } from '@/components/app/focus-mode';
 
 type AppHeaderProps = {
-  onAddGoal: (title: string, description: string, deadline?: Date) => Promise<void>;
+  onAddGoal: (title: string, description: string, type: 'learn' | 'build', deadline?: Date) => Promise<void>;
 };
 
 const formSchema = z.object({
@@ -44,6 +46,9 @@ const formSchema = z.object({
   }),
   description: z.string().optional(),
   deadline: z.date().optional(),
+  type: z.enum(['learn', 'build'], {
+    required_error: "You need to select a goal type.",
+  }),
 });
 
 
@@ -56,11 +61,12 @@ export function AppHeader({ onAddGoal }: AppHeaderProps) {
       title: '',
       description: '',
       deadline: undefined,
+      type: 'learn',
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onAddGoal(values.title, values.description || '', values.deadline);
+    await onAddGoal(values.title, values.description || '', values.type, values.deadline);
     form.reset();
     setIsDialogOpen(false);
   };
@@ -76,14 +82,16 @@ export function AppHeader({ onAddGoal }: AppHeaderProps) {
             </h1>
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add New Goal
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+          <div className="flex items-center gap-2">
+            <FocusModeToggle />
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add New Goal
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Create a New Goal</DialogTitle>
                 <DialogDescription>
@@ -94,12 +102,54 @@ export function AppHeader({ onAddGoal }: AppHeaderProps) {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>I want to...</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex space-x-4"
+                          >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="learn" id="learn" className="peer sr-only" />
+                              </FormControl>
+                              <FormLabel
+                                htmlFor="learn"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-32"
+                              >
+                                <BookOpen className="mb-2 h-6 w-6" />
+                                Learn
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="build" id="build" className="peer sr-only" />
+                              </FormControl>
+                              <FormLabel
+                                htmlFor="build"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer w-32"
+                              >
+                                <Hammer className="mb-2 h-6 w-6" />
+                                Build
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="title"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Goal Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Learn to Play Guitar" {...field} />
+                          <Input placeholder="e.g., Learn Next.js" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -169,9 +219,10 @@ export function AppHeader({ onAddGoal }: AppHeaderProps) {
                     <Button type="submit">Create Goal</Button>
                   </DialogFooter>
                 </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
     </header>

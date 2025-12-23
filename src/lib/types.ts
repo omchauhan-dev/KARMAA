@@ -13,6 +13,7 @@ export type Goal = {
   title: string;
   description: string;
   deadline?: string;
+  type?: 'learn' | 'build';
   tasks: Task[];
   generatingTasks?: boolean;
 };

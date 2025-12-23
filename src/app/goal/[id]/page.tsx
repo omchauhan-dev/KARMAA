@@ -27,6 +27,7 @@ import { UpgradeDialog } from '@/components/app/upgrade-dialog';
 import { ExportButton } from '@/components/app/export-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GoalChat } from '@/components/app/goal-chat';
+import { TaskNudge } from '@/components/app/task-nudge';
 
 // Helper function to add unique IDs to tasks and subtasks
 const addIdsToTasks = (tasks: Omit<Task, 'id' | 'completed' | 'subTasks'> & { subTasks: any[] }[]): Task[] => {
@@ -162,7 +163,12 @@ export default function GoalDetailPage() {
     });
     
     try {
-      const result = await generateTasksForGoal({ title: goal.title, description: goal.description });
+      // Default to 'learn' if not specified (legacy goals), or infer/ask. 
+      // For now we'll assume 'learn' or pass a generic type if we updated Goal type.
+      // But we haven't updated Goal type in src/lib/types.ts yet. 
+      // We should probably just pass 'learn' for now or update Goal type.
+      // Let's assume 'learn' for legacy/regenerate for simplicity as we didn't add 'type' to Goal yet.
+      const result = await generateTasksForGoal({ title: goal.title, description: goal.description, type: 'learn' });
       const tasksWithIds = addIdsToTasks(result.tasks || []);
       handleUpdate(draft => {
           draft.tasks = tasksWithIds;
@@ -216,6 +222,7 @@ export default function GoalDetailPage() {
   return (
     <>
       <GoalChat goal={goal} />
+      <TaskNudge goal={goal} />
       <UpgradeDialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog} />
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
