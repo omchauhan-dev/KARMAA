@@ -48,7 +48,7 @@ export function FocusModeProvider({ children }: { children: React.ReactNode }) {
                     <div className="h-6 w-px bg-border mx-1" />
                      <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="rounded-full h-10 w-10" onClick={() => window.open('vscode://', '_blank')}>
+                            <Button variant="ghost" size="icon" className="rounded-full h-10 w-10" onClick={() => (window as any).electron.openExternal('vscode://')}>
                                 <Code className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>

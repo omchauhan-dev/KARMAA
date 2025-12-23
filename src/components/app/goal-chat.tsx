@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageSquare, Send } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { chatWithGoal } from '@/ai/flows/chat-flow';
 import type { Goal } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import {
@@ -40,7 +39,7 @@ export function GoalChat({ goal }: GoalChatProps) {
     setIsLoading(true);
 
     try {
-      const response = await chatWithGoal({
+      const response = await (window as any).electron.chatWithGoal({
         message: userMessage,
         goalContext: {
           title: goal.title,

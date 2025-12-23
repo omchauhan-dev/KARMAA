@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 type GoalCardProps = {
@@ -90,7 +90,7 @@ export function GoalCard({ goal, onDelete }: GoalCardProps) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      <Link href={`/goal/${goal.id}`} className="block h-full flex flex-col">
+      <Link to={`/goal/${goal.id}`} className="block h-full flex flex-col">
         <CardHeader>
             <CardTitle className="font-headline pr-8">{goal.title}</CardTitle>
             <CardDescription className="mt-1 line-clamp-2 h-[40px]">{goal.description}</CardDescription>
